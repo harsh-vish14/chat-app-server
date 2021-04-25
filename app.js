@@ -28,11 +28,14 @@ const io = socket(server);
 io.on('connection', (socket) => {
     console.log('user joint')
     socket.on('chat-input', (data) => {
-        socket.broadcast.emit(`message-came-${data.id}`, data.message);
+        socket.broadcast.emit(`message-came-${data.channelId}`, data.chatDetails);
+        db.collection('channels').doc(data.channelId).update({
+            chat: firebase.firestore.FieldValue.arrayUnion(data.chatDetails)
+        })
+        console.log(data)
     })
     socket.on('new-users-entered', (data) => {
         socket.broadcast.emit(`chat-${data.chatId} `, data);
-        
         console.log(data);
     })
     socket.on('disconnect', () => {
